@@ -10,7 +10,7 @@ app.use(express.json());
 
 
 //MongoDB
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.apksail.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -32,7 +32,7 @@ async function run() {
     const toyCollection = client.db("toyManager").collection("toy")
 
 
-    // Insert a toy to database
+    // Insert (Create) a toy to database
     app.post("/upload-toy", async (req, res) => {
       const data = req.body
       console.log(data);
@@ -40,11 +40,26 @@ async function run() {
       res.send(result)
     })
     
-    // Get a toy from database
+    // Get (Read) a toy from database
     app.get("/all-toys", async (req, res) => { 
       const toys = toyCollection.find();
       const result = await toys.toArray();
       res.send(result);
+    })
+
+    
+    //Update a toy data using id
+    app.patch("/toy/:id", async (req, res) => { 
+      const id = req.params.id;
+      const updateToyData = req.body;
+      const filter = { _id: new ObjectId(id) }
+      const updatedDoc = {
+        $set: {
+          ...updateToyData
+        }
+      }
+      const result = await toyCollection.updateOne(filter, updatedDoc)
+      res.send(result)
     })
 
 
