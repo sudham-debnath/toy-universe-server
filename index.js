@@ -87,7 +87,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Toy Universe Server is running successfully')
+    res.send('Toy Universe Server is running successfully on port 5000')
 });
 
 app.listen(port, () => {
