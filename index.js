@@ -29,6 +29,29 @@ async function run() {
 
     const toyCollection = client.db("toyManager").collection("toy");
 
+
+
+    //Toy search by Name 
+    const indexKeys = { name: 1 };
+    const indexOptions = { name: "name" }; 
+    const result = await toyCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/searchToyByName/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await toyCollection
+        .find({
+          $or: [
+            { name: { $regex: text, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
+
+    
+
+
+
     // Insert (Create) a toy to database
     app.post("/upload-toy", async (req, res) => {
       const data = req.body;
@@ -70,7 +93,7 @@ async function run() {
       }
     });
 
-    //Book Details
+    //Toy Details
     app.get("/toy/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -86,6 +109,7 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
 
     await client.db("admin").command({ ping: 1 });
     console.log(
